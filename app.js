@@ -14,7 +14,7 @@ const User = require("./models/user");
 const ExpressError = require("./utils/ExpressError");  
 const listingRoutes = require("./routes/listing");
 const reviewRoutes = require("./routes/review");
-
+const userRoutes = require("./routes/user");
 
 
 mongoose
@@ -63,11 +63,11 @@ app.use((req, res, next) => {
 });
 
 
-app.get("/fakeUser", async (req, res) => {
-  let user = new User({  email: "testuser@example.com", username: "testuser" });
-  let registeredUser = await User.register(user, "mypassword");
-  res.send(registeredUser);
-});
+// app.get("/fakeUser", async (req, res) => {
+//   let user = new User({  email: "testuser@example.com", username: "testuser" });
+//   let registeredUser = await User.register(user, "mypassword");
+//   res.send(registeredUser);
+// });
 
 
 
@@ -80,7 +80,7 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/listings", listingRoutes);
 app.use("/listings/:id/reviews", reviewRoutes);
-
+app.use("/", userRoutes);
 
 
 app.use((req, res, next) => {
