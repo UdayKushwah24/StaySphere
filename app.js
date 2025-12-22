@@ -5,9 +5,11 @@ const path = require("path");
 const methodOverride = require("method-override");
 // const wrapAsync = require("./utils/wrapAsync");
 const ejsMate = require("ejs-mate");
-const sessioin = require("express-session");
+const session = require("express-session");
 const flash = require("connect-flash");
-
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user");
 
 const ExpressError = require("./utils/ExpressError");  
 const listingRoutes = require("./routes/listing");
@@ -41,8 +43,17 @@ app.get("/", (req, res) => {
   res.send("Hi, I am root");
 });
 
-app.use(sessioin(sessionOptions));
+app.use(session(sessionOptions));
 app.use(flash());
+
+
+// Passport configuration
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
  
 // Flash middleware
 app.use((req, res, next) => {
@@ -51,6 +62,12 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.get("/fakeUser", async (req, res) => {
+  let user = new User({  email: "testuser@example.com", username: "testuser" });
+  let registeredUser = await User.register(user, "mypassword");
+  res.send(registeredUser);
+});
 
 
 
