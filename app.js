@@ -59,9 +59,10 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
+   res.locals.currentUser = req.user;
   next();
 });
-
+ 
 
 // app.get("/fakeUser", async (req, res) => {
 //   let user = new User({  email: "testuser@example.com", username: "testuser" });
