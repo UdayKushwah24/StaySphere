@@ -5,9 +5,16 @@ const path = require("path");
 const methodOverride = require("method-override");
 // const wrapAsync = require("./utils/wrapAsync");
 const ejsMate = require("ejs-mate");
+const sessioin = require("express-session");
+const flash = require("connect-flash");
+
+
 const ExpressError = require("./utils/ExpressError");  
 const listingRoutes = require("./routes/listing");
 const reviewRoutes = require("./routes/review");
+
+
+
 mongoose
   .connect("mongodb://127.0.0.1:27017/airbnb")
   .then(() => {
@@ -17,11 +24,37 @@ mongoose
     console.log(err);
   });
 
+
+
+const sessionOptions = {
+  secret: "mysupersecretcode",
+  resave: false,
+  saveUninitialized: true,
+  cookie : {
+    httpOnly : true,
+    expires : Date.now() + 1000 * 60 * 60 * 24 *7,
+    maxAge : 1000 * 60 * 60 * 24 *7
+  }
+};
+
 app.get("/", (req, res) => {
   res.send("Hi, I am root");
 });
 
+app.use(sessioin(sessionOptions));
+app.use(flash());
  
+// Flash middleware
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
+
+
+
+
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
@@ -30,6 +63,7 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/listings", listingRoutes);
 app.use("/listings/:id/reviews", reviewRoutes);
+
 
 
 app.use((req, res, next) => {
