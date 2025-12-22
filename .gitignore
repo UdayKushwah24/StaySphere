@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Environment variables (Secrets)
+.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE settings
+.vscode/
+.idea/
+
+# Uploads / temp files (agar future me add ho)
+uploads/
+temp/
+
+# Word documents (project docs)
+*.docx
+
+# Build files (future use)
+dist/
+build/
