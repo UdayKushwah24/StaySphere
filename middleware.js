@@ -22,6 +22,7 @@
 const { listingSchema , reviewSchema} = require("./schema");
 const ExpressError = require("./utils/ExpressError");
 const Listing = require("./models/listing");
+const Review = require("./models/review");
 const validateListing = (req, res, next) => {
   const { error } = listingSchema.validate(req.body);
   if (error) {
@@ -71,4 +72,31 @@ const isOwner = async (req, res, next) => {
 };
 
 
-module.exports = { validateListing, validateReview , isLoggedIn, savedRedirectUrl, isOwner};
+
+// const isReviewAuthor = async (req, res, next) => {
+//     let { reviewId } = req.params;
+//     let review = await Review.findById(reviewId);
+//     if (!review.auhtor.equals(res.locals.currentUser._id)) {
+//       req.flash("error", "You donot have permission to delete it!");
+//       return res.redirect(`/listings/${id}`);
+//     }
+//     next();
+// };
+const isReviewAuthor = async (req, res, next) => {
+  const { id, reviewId } = req.params;
+
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    req.flash("error", "Review not found!");
+    return res.redirect(`/listings/${id}`);
+  }
+
+  if (!review.author.equals(req.user._id)) {
+    req.flash("error", "You do not have permission to delete it!");
+    return res.redirect(`/listings/${id}`);
+  }
+  next();
+};
+
+
+module.exports = { validateListing, validateReview , isLoggedIn, savedRedirectUrl, isOwner, isReviewAuthor};
