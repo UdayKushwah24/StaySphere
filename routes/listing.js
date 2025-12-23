@@ -57,6 +57,13 @@ const Listing = require("../models/listing");
 const { validateListing, isLoggedIn, isOwner } = require("../middleware");
 const listingController = require("../controllers/listings");
 
+
+const multer = require("multer");
+const {  storage } = require("../cloudConfig");
+const upload = multer({ storage: storage });
+
+
+
 // index route
 //Create Route
 router
@@ -64,9 +71,11 @@ router
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
+    upload.single("listing[image]"),
     validateListing,
     wrapAsync(listingController.createListing)
   );
+  
 
 //New Route
 router.get("/new", isLoggedIn, listingController.renderNewForm);
@@ -90,11 +99,12 @@ router
   .put(
     isLoggedIn,
     isOwner,
+     upload.single("listing[image]"),
     validateListing,
     wrapAsync(listingController.updateListing)
   )
   .delete(isLoggedIn, isOwner, wrapAsync(listingController.deleteListing));
 
 
-  
+
 module.exports = router; // All the routes for listing will go here
