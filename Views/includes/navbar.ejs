@@ -37,13 +37,16 @@
       </div>
 
       <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search">
+        <form id="searchForm" class="d-flex" role="search" method="GET" action="/listings">
           <input
+            id="searchInput"
+            name="q"
             class="form-control me-2"
             type="search"
             placeholder="Search destinations"
-           
+            value="<%= typeof q !== 'undefined' ? q : '' %>"
           />
+          <input type="hidden" id="categoryInput" name="category" value="<%= typeof category !== 'undefined' ? category : '' %>">
           <button class="btn btn-search" type="submit"> <i class="fa-solid fa-magnifying-glass"></i> Search</button>
         </form>
       </div>

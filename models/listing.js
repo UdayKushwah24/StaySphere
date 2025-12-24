@@ -24,6 +24,7 @@ const listingSchema = new Schema({
   price: Number,
   location: String,
   country: String,
+  category: { type: String, trim: true, lowercase: true },
   reviews: [
     {
       type: Schema.Types.ObjectId,
@@ -53,6 +54,8 @@ listingSchema.post("findOneAndDelete", async (listing) => {
   }
 })
 
+// text index for later full-text search optimizations
+listingSchema.index({ title: 'text', location: 'text', country: 'text', description: 'text' });
 
 const Listing = mongoose.model("Listing", listingSchema);
 module.exports = Listing;

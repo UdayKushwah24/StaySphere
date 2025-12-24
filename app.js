@@ -14,6 +14,9 @@ const methodOverride = require("method-override");
 // const wrapAsync = require("./utils/wrapAsync");
 const ejsMate = require("ejs-mate");
 const session = require("express-session");
+const MongoStore = require("connect-mongo").default;
+
+
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -24,9 +27,10 @@ const listingRoutes = require("./routes/listing");
 const reviewRoutes = require("./routes/review");
 const userRoutes = require("./routes/user");
 
-
+// let url = "mongodb://127.0.0.1:27017/airbnb";
+let mongoDBUrl = process.env.ATLASDB_URL;
 mongoose
-  .connect("mongodb://127.0.0.1:27017/airbnb")
+  .connect(mongoDBUrl)
   .then(() => {
     console.log("DB connected");
   })
@@ -34,10 +38,21 @@ mongoose
     console.log(err);
   });
 
+const store = MongoStore.create({
+  mongoUrl: mongoDBUrl,
+  crypto: {
+    secret: process.env.SECRET,  
+  },
+  touchAfter: 24 * 60 * 60,
+});
 
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
 
 const sessionOptions = {
-  secret: "mysupersecretcode",
+  store: store,
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie : {
@@ -47,9 +62,13 @@ const sessionOptions = {
   }
 };
 
+
+
 // app.get("/", (req, res) => {
 //   res.send("Hi, I am root");
 // });
+
+
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -67,7 +86,10 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
-   res.locals.currentUser = req.user;
+  res.locals.currentUser = req.user;
+  // expose current search query and category to all views (defaults to empty strings)
+  res.locals.q = req.query.q || "";
+  res.locals.category = req.query.category || "";
   next();
 });
  

@@ -5,10 +5,58 @@ const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
+// escape user input for regex search
+function escapeRegex(text = "") {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 module.exports.index = async (req, res) => {
-  let allListings = await Listing.find({});
-  // console.log(data);
-  res.render("listings/index.ejs", { allListings });
+  try {
+    const qRaw = req.query.q || "";
+    const categoryRaw = req.query.category || "";
+    const q = qRaw.trim();
+    const category = categoryRaw.trim().toLowerCase();
+
+    // Build combined AND query so q and category can both be applied
+    const andClauses = [];
+
+    if (q) {
+      const safe = escapeRegex(q);
+      const regex = new RegExp(safe, "i");
+      andClauses.push({
+        $or: [
+          { title: regex },
+          { location: regex },
+          { country: regex },
+          { description: regex }
+        ]
+      });
+    }
+
+    if (category) {
+      // treat category both as explicit category field OR as keyword in text fields
+      const catSafe = escapeRegex(category.replace(/-/g, ' '));
+      const catRegex = new RegExp(catSafe, "i");
+      andClauses.push({
+        $or: [
+          { category: category },
+          { title: catRegex },
+          { location: catRegex },
+          { country: catRegex },
+          { description: catRegex }
+        ]
+      });
+    }
+
+    const mongoQuery = andClauses.length ? { $and: andClauses } : {};
+
+    const allListings = await Listing.find(mongoQuery).exec();
+    res.render("listings/index.ejs", { allListings, q, category });
+  } catch (err) {
+    console.error("Listings index error:", err);
+    req.flash("error", "Unable to fetch listings");
+    res.redirect("/listings");
+  }
 };
 
 module.exports.renderNewForm = (req, res, next) => {
