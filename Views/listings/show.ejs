@@ -1,5 +1,10 @@
 <% layout("/layouts/boilerplate") -%>
 <body>
+  <script>
+    const mapToken = "<%= process.env.MAP_TOKEN %>"
+    const listing = <%- JSON.stringify(listing) %>; 
+   
+  </script>
   <div class="row mt-3">
     <div class="col-lg-8 offset-3">
       <h3><b> <%= listing.title %> </b></h3>
@@ -123,34 +128,9 @@
         <button class="btn btn-outline-dark">Submit</button>
       </form>
       <hr />
-      <% } %>
-      <h4><b> All Reviews </b></h4>
-
-      <!-- <div class="row">
-
-                    <% for(review of listing.reviews) { %>
-                        <div class="card col-6 mb-3 ms-3">
-                            <div class="card-body">
-                    
-                                <h5 class="card-title">
-                                    <%= listing.title %>
-                                </h5>
-                                <p class="card-text">
-                                    <%= review.comment %>
-                                </p>
-                                <p class="card-text">
-                                    <%= review.rating %>
-                                </p>
-                            </div>
-                        </div>
-                
-                        <% } %>
-                    
-                 
-                       
-
-            </div> -->
+      <% } %> <% if (listing.reviews.length > 0) { %>
       <div class="row">
+        <h4><b> All Reviews </b></h4>
         <% for (review of listing.reviews) { %>
         <div class="col-md-6 col-12 mb-3">
           <div class="card shadow-sm p-2 mb-3">
@@ -173,8 +153,37 @@
             </form>
           </div>
         </div>
-        <% } %>
-      </div>
+          <% } %>
+        </div>
+          <% } %>
     </div>
+
+    <!-- </div>
+      <div class="col-6 offset-3 mb-3">
+        <h3>Where you' ll be</h3>
+                  
+          <div id="map"></div>
+
+          <div id="menu">
+              <input id="standard-satellite" type="radio" name="rtoggle" value="satellite" checked="checked">
+              <label for="standard-satellite">standard-satellite</label>
+              <input id="light-v11" type="radio" name="rtoggle" value="light">
+              <label for="light-v11">light</label>
+              <input id="dark-v11" type="radio" name="rtoggle" value="dark">
+              <label for="dark-v11">dark</label>
+              <input id="standard" type="radio" name="rtoggle" value="standard">
+              <label for="standard">standard</label>
+              <input id="outdoors-v12" type="radio" name="rtoggle" value="outdoors">
+              <label for="outdoors-v12">outdoors</label>
+          </div>
+      </div> -->
+      <div class="col-6 offset-3 mb-3">
+        <h3>Where you' ll be</h3>
+        <div id="map"></div>
+      </div>
   </div>
+</div>
+
+
+  <script src="/js/map.js"></script>
 </body>

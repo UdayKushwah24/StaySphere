@@ -117,3 +117,11 @@ body {
 .show-card {
     padding: 0;
 }
+
+
+/* map styling */
+#map {
+  width: 80vh;
+  height: 400px;
+  border-radius: 1rem;
+}
