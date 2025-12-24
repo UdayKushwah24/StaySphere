@@ -103,8 +103,8 @@ app.use((req, res, next) => {
 
 
 
-app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
@@ -122,7 +122,7 @@ app.use((err, req, res, next) => {
   let { statusCode = 500, message = "message went wrong" } = err;
   // res.send("something went wrong")
   // res.status(statusCode).send(message);
-  res.status(statusCode).render("error.ejs", { message });
+  res.status(statusCode).render("error", { message });
 });
 
 
